@@ -3,26 +3,21 @@
 #include <random>
 #include <stdexcept>
 
-// Конструктор по умолчанию
 matrix::matrix() : rows_(0), cols_(0), data_(nullptr) {}
 
-// Конструктор квадратной матрицы (единичная матрица)
 matrix::matrix(int x) : rows_(x), cols_(x), data_(nullptr) {
     if (x < 0) {
         throw std::invalid_argument("Размер матрицы не может быть отрицательным");
     }
     if (x == 0) return;
 
-    // Выделяем память под массив указателей на строки
     data_ = new int*[x];
     for (int i = 0; i < x; ++i) {
-        // Выделяем память под каждую строку и сразу обнуляем её (скобки () в конце)
         data_[i] = new int[x](); 
-        data_[i][i] = 1; // Делаем матрицу единичной
+        data_[i][i] = 1;
     }
 }
 
-// Конструктор прямоугольной матрицы
 matrix::matrix(int x, int y) : rows_(x), cols_(y), data_(nullptr) {
     if (x < 0 || y < 0) {
         throw std::invalid_argument("Размер матрицы не может быть отрицательным");
@@ -33,11 +28,10 @@ matrix::matrix(int x, int y) : rows_(x), cols_(y), data_(nullptr) {
 
     data_ = new int*[x];
     for (int i = 0; i < x; ++i) {
-        data_[i] = new int[y](); // Обнуляем память
+        data_[i] = new int[y]();
     }
 }
 
-// Деструктор: ОСВОБОЖДАЕМ ПАМЯТЬ!
 matrix::~matrix() {
     for (int i = 0; i < rows_; ++i) {
         delete[] data_[i];
@@ -100,4 +94,53 @@ int matrix::sum() const {
         }
     }
     return total;
+}
+
+matrix::matrix(const matrix& other) : rows_(other.rows_), cols_(other.cols_), data_(nullptr) {
+    if (rows_ == 0 || cols_ == 0) {
+        rows_ = 0;
+        cols_ = 0;
+        return;
+    }
+
+    data_ = new int*[rows_];
+    for (int i = 0; i < rows_; i++) {
+        data_[i] = new int[cols_];
+        for (int j = 0; j < cols_; j++) {
+            data_[i][j] = other.data_[i][j];
+        }
+    }
+}
+
+matrix& matrix::operator=(const matrix& other) {
+    if (this == &other) {
+        return *this;
+    }
+    for (int i = 0; i < rows_; ++i) {
+        delete[] data_[i];
+    }
+    delete[] data_;
+
+    data_ = nullptr;
+    rows_ = 0;
+    cols_ = 0;
+
+    if (other.data_ == nullptr) {
+        return *this;
+    }
+
+    rows_ = other.rows_;
+    cols_ = other.cols_;
+    data_ = new int*[rows_];
+    for (int i = 0; i < rows_; ++i) {
+        data_[i] = new int[cols_];
+    }
+
+    for (int i = 0; i < rows_; i++) {
+        for (int j = 0; j < cols_; j++) {
+            data_[i][j] = other.data_[i][j];
+        }
+    }
+
+    return *this;
 }

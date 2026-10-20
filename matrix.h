@@ -30,6 +30,9 @@ class matrix {
 
         void inputFromKeyboard();
         void fillRandom();
+
+        matrix(const matrix& other);
+        matrix& operator=(const matrix& other);
 };
 
 #endif
